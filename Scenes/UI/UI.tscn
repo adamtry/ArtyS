@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://b3s2egk1ax2hy"]
+
+[ext_resource type="Script" path="res://Scenes/UI/Camera.gd" id="1_8c5h0"]
+
+[node name="UI" type="CanvasLayer"]
+
+[node name="Camera" type="Camera2D" parent="."]
+script = ExtResource("1_8c5h0")
+
+[node name="Panel" type="Panel" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0

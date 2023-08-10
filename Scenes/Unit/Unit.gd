@@ -1,46 +1,53 @@
 extends CharacterBody2D
 
-@export var selected = false;
+@export var selected = false
+@onready var box = get_node("Box")
 
-const SPEED: float = 300
-const STOP_DISTANCE = 20
-var target = Vector2.ZERO;
+@onready var target = position
+var follow_cursor = false
+var speed = 50
+
+var target_coords: Array[Vector2]
 
 func _ready():
-	position.x = 500
-	position.y = 500
-	target = position
-	velocity = Vector2.ZERO
+	set_selected(selected)
+	target_coords = []
 
+func set_selected(value):
+	selected = value
+	box.visible = value
 
-func _process(delta):
-	if selected or velocity != Vector2.ZERO:
-		handle_move_commands()
+func _input(event):
+	if event.is_action_pressed("move"):
+		follow_cursor = true
+	if event.is_action_released("move"):
+		follow_cursor = false
 
-	# Select when clicked
-	if Input.is_action_just_pressed("left_click"):
-		var click_pos = get_global_mouse_position()
-		if click_pos.distance_to(position) < self.get_node("Sprite2D").texture.get_width():
-			_toggle_select(true)
-		else:
-			_toggle_select(false)
-
-
-func _toggle_select(on=true):
-	if not selected and on:
-		self.get_node("Sprite2D").modulate = Color(0, 0, 1)
-		selected = true
-	if selected and not on:
-		self.get_node("Sprite2D").modulate = Color(1, 1, 1)
-		selected = false
-
-
-func handle_move_commands():
-	if Input.is_action_just_pressed("right_click"):
-		target = get_global_mouse_position()
-	if position.distance_to(target) > STOP_DISTANCE:
-		velocity = position.direction_to(target) * SPEED
-	else:
-		velocity = Vector2.ZERO
-	move_and_slide()
+func _physics_process(delta):
+	handle_selection()
 	
+	if follow_cursor == true:
+		if selected:
+			if Input.is_action_just_pressed("queue_move"):
+				target_coords.append(get_global_mouse_position())
+			elif Input.is_action_just_pressed("move"):
+				target_coords = [get_global_mouse_position()]
+	if target_coords:
+		velocity = position.direction_to(target_coords[0]) * speed
+		if position.distance_to(target_coords[0]) > 15:
+			move_and_slide()
+
+func handle_selection():
+	if Input.is_action_just_pressed("select"):
+		var click_pos = get_global_mouse_position()
+		if click_pos.distance_to(position) < $Sprite.texture.get_width():
+			if not selected:
+				$Sprite.modulate = Color.CORNFLOWER_BLUE
+				selected = true
+		else:
+			selected = false
+			
+	if selected:
+		$Sprite.modulate = Color.CORNFLOWER_BLUE
+	else:
+		$Sprite.modulate = Color.WHITE

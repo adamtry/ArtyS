@@ -1,18 +1,74 @@
-[gd_scene load_steps=4 format=3 uid="uid://b2pjqmlxjcgjn"]
+[gd_scene load_steps=5 format=3 uid="uid://b2pjqmlxjcgjn"]
 
-[ext_resource type="Texture2D" uid="uid://8x16s8ac48jc" path="res://icon.svg" id="1_758q2"]
-[ext_resource type="Script" path="res://Scenes/Unit/Unit.gd" id="1_c2kog"]
+[ext_resource type="Texture2D" uid="uid://cpipdqa6d83ea" path="res://Resources/Soldier.svg" id="1_5lyx2"]
+[ext_resource type="PackedScene" uid="uid://c3s67clj8g7bl" path="res://Scenes/Weapon/Weapon.tscn" id="2_rm57o"]
+
+[sub_resource type="GDScript" id="GDScript_3h45x"]
+script/source = "extends CharacterBody2D
+
+@export var selected = false
+@export var colour = Color.WHITE
+
+var target = position
+var speed = 200
+
+var target_coords: Array[Vector2]
+
+var selection_radius: int;
+
+func _ready():
+	set_selected(selected)
+	target_coords = []
+	selection_radius = $CollisionBorder.shape.radius * self.scale.length()
+
+func set_selected(value):
+	selected = value
+
+func _physics_process(delta):
+	handle_selection()
+	
+	if selected:
+		if Input.is_action_just_pressed(\"queue_move\"):
+			target_coords.append(get_global_mouse_position())
+		elif Input.is_action_just_pressed(\"move\"):
+			target_coords = [get_global_mouse_position()]
+	if target_coords:
+		velocity = position.direction_to(target_coords[0]) * speed
+		rotation = velocity.angle()
+		if position.distance_to(target_coords[0]) > 15:
+			move_and_slide()
+		else:
+			target_coords.remove_at(0)
+
+func handle_selection():
+	if Input.is_action_just_pressed(\"select\"):
+		var click_pos = get_global_mouse_position()
+		if click_pos.distance_to(position) < selection_radius:
+			if not selected:
+				selected = true
+		else:
+			selected = false
+	if selected:
+		$Sprite.modulate = colour.darkened(0.5)
+		$Weapon.get_node(\"Sprite\").modulate = colour.darkened(0.5)
+	else:
+		$Sprite.modulate = colour
+		$Weapon.get_node(\"Sprite\").modulate = colour
+"
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_8hg7k"]
-radius = 76.7919
+radius = 133.507
 
-[node name="Unit" type="Node2D"]
+[node name="Unit" type="CharacterBody2D"]
+scale = Vector2(0.25, 0.25)
+safe_margin = 10.0
+script = SubResource("GDScript_3h45x")
 
-[node name="Unit" type="CharacterBody2D" parent="."]
-script = ExtResource("1_c2kog")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Unit"]
+[node name="CollisionBorder" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_8hg7k")
 
-[node name="Sprite2D" type="Sprite2D" parent="Unit"]
-texture = ExtResource("1_758q2")
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_5lyx2")
+offset = Vector2(0.129623, 0)
+
+[node name="Weapon" parent="." instance=ExtResource("2_rm57o")]

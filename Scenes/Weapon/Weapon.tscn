@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3s67clj8g7bl"]
+
+[ext_resource type="Texture2D" uid="uid://b0c0lqeqfydjr" path="res://Resources/BaseGun.svg" id="1_tl2uc"]
+
+[node name="Weapon" type="Node2D"]
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_tl2uc")
+offset = Vector2(58, 0)

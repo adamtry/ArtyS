@@ -1,7 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://cu1blxum4336s"]
+[gd_scene load_steps=3 format=3 uid="uid://cu1blxum4336s"]
 
-[ext_resource type="PackedScene" uid="uid://b2pjqmlxjcgjn" path="res://Scenes/Unit/Unit.tscn" id="1_q35j5"]
+[ext_resource type="Script" path="res://Scenes/Controller.gd" id="2_ovq0j"]
+[ext_resource type="PackedScene" uid="uid://b3s2egk1ax2hy" path="res://Scenes/UI/UI.tscn" id="2_poedw"]
 
 [node name="Root" type="Node2D"]
 
-[node name="Unit" parent="." instance=ExtResource("1_q35j5")]
+[node name="Controller" type="Node" parent="."]
+script = ExtResource("2_ovq0j")
+
+[node name="UI" parent="." instance=ExtResource("2_poedw")]
